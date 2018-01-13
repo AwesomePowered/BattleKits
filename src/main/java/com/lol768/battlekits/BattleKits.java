@@ -14,15 +14,15 @@ import com.lol768.battlekits.commands.CommandRefillAll;
 import com.lol768.battlekits.commands.CommandKitCreation;
 import com.lol768.battlekits.commands.CommandBattleKits;
 import com.lol768.battlekits.commands.CommandSoup;
-import com.lol768.battlekits.utilities.Metrics;
 import com.lol768.battlekits.utilities.Updater.UpdateResult;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
+
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
@@ -43,6 +43,7 @@ public class BattleKits extends JavaPlugin {
     public ConfigAccessor global;
     public ConfigAccessor kits;
     public ConfigAccessor kitHistory;
+    private Metrics metrics;
 
     @Override
     public void onEnable() {
@@ -70,29 +71,7 @@ public class BattleKits extends JavaPlugin {
     }
 
     private void startMetrics() {
-        try {
-            Metrics metrics = new Metrics(this);
-            metrics.addCustomData(new Metrics.Plotter("Number of kits") {
-                @Override
-                public int getValue() {
-                    return kits.getConfig().getConfigurationSection("kits").getKeys(false).size();
-                }
-            });
-
-            metrics.addCustomData(new Metrics.Plotter("Restrictions enabled") {
-                @Override
-                public int getValue() {
-                    if (global.getConfig().getBoolean("settings.enable-restrictions")) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            });
-            metrics.start();
-        } catch (IOException e) {
-            this.getLogger().severe("Metrics failed.");
-
-        }
+        metrics = new Metrics(this);
     }
 
     /**
@@ -273,7 +252,7 @@ public class BattleKits extends JavaPlugin {
     public ItemStack setColor(ItemStack item, int color) {
         /*CraftItemStack craftStack = null;
          net.minecraft.server.v1_4_5.ItemStack itemStack = null;
-		
+
          if (item instanceof CraftItemStack) {
          craftStack = (CraftItemStack) item;
          itemStack = craftStack.getHandle();
@@ -282,7 +261,7 @@ public class BattleKits extends JavaPlugin {
          itemStack = craftStack.getHandle();
          }
          NBTTagCompound tag = itemStack.tag;
-		
+
          if (tag == null) {
          tag = new NBTTagCompound();
          tag.setCompound("display", new NBTTagCompound());

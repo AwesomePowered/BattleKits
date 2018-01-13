@@ -1,61 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.lol768.BattleKits</groupId>
-  <artifactId>Aurora</artifactId>
-  <name>BattleKits Aurora</name>
-  <version>2.1</version>
+  <groupId>com.lol768</groupId>
+  <artifactId>BattleKits</artifactId>
+  <name>BattleKits</name>
+  <version>2.1.1</version>
   <description>BattleKits, with added Maven.</description>
   <build>
-    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-file</artifactId>
-        <version>2.2</version>
-      </extension>
-    </extensions>
+    <defaultGoal>clean package</defaultGoal>
     <resources>
       <resource>
-        <targetPath>.</targetPath>
         <filtering>true</filtering>
-        <directory>${basedir}/src/main/resources/</directory>
-        <includes>
-          <include>*.yml</include>
-          <include>*.txt</include>
-        </includes>
+        <directory>src/main/resources</directory>
       </resource>
     </resources>
-    <finalName>${artifactId}</finalName>
+    <finalName>${project.name}</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
+        <version>3.6.1</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>build</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/package.xml</descriptor>
-          </descriptors>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.0</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -65,39 +36,78 @@
           </execution>
         </executions>
         <configuration>
-          <minimizeJar>true</minimizeJar>
-          <artifactSet>
-            <excludes>
-              <exclude>org.bukkit</exclude>
-              <exclude>net.milkbowl.vault</exclude>
-            </excludes>
-          </artifactSet>
+          <relocations>
+            <relocation>
+              <pattern>org.bstats</pattern>
+              <shadedPattern>com.lol768.battlekits</shadedPattern>
+            </relocation>
+          </relocations>
         </configuration>
       </plugin>
     </plugins>
   </build>
   <repositories>
     <repository>
-      <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public/</url>
+      <id>spigotmc-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+    </repository>
+    <repository>
+      <id>sonatype</id>
+      <url>https://oss.sonatype.org/content/groups/public/</url>
     </repository>
     <repository>
       <id>vault-repo</id>
-      <url>http://ci.herocraftonline.com/plugin/repository/everything</url>
+      <url>http://nexus.hc.to/content/repositories/pub_releases</url>
+    </repository>
+    <repository>
+      <id>bstats-repo</id>
+      <url>http://repo.bstats.org/content/repositories/releases/</url>
     </repository>
   </repositories>
   <dependencies>
     <dependency>
-      <groupId>net.milkbowl.vault</groupId>
-      <artifactId>Vault</artifactId>
-      <version>1.2.25-SNAPSHOT</version>
-      <scope>compile</scope>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>1.12.2-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-lang</artifactId>
+          <groupId>commons-lang</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>json-simple</artifactId>
+          <groupId>com.googlecode.json-simple</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>guava</artifactId>
+          <groupId>com.google.guava</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>gson</artifactId>
+          <groupId>com.google.code.gson</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>snakeyaml</artifactId>
+          <groupId>org.yaml</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>bungeecord-chat</artifactId>
+          <groupId>net.md-5</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>LATEST</version>
-      <scope>compile</scope>
+      <groupId>net.milkbowl.vault</groupId>
+      <artifactId>VaultAPI</artifactId>
+      <version>1.6</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>bukkit</artifactId>
+          <groupId>org.bukkit</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>
