@@ -36,11 +36,9 @@ public class RestrictionEvents implements Listener {
 
     @EventHandler
     public void pickup(PlayerPickupItemEvent e) {
-
         if (!e.getPlayer().hasPermission("BattleKits.bypassRestriction.disable-pickup-items") && !e.isCancelled()) {
             e.setCancelled(true);
         }
-
     }
 
     @EventHandler
@@ -48,7 +46,6 @@ public class RestrictionEvents implements Listener {
         if (!e.getPlayer().hasPermission("BattleKits.bypassRestriction.disable-block-place") && !e.isCancelled()) {
             e.setCancelled(true);
         }
-
     }
 
     @EventHandler
@@ -56,11 +53,9 @@ public class RestrictionEvents implements Listener {
         if (!e.getEntity().hasPermission("BattleKits.bypassRestriction.disable-player-xp-drop")) {
             e.setDroppedExp(0);
         }
-
         if (!e.getEntity().hasPermission("BattleKits.bypassRestriction.disable-player-drops-on-death")) {
             e.getDrops().clear();
         }
-
         if (!e.getEntity().hasPermission("BattleKits.bypassRestriction.hide-death-messages")) {
             e.setDeathMessage(null);
         }
@@ -73,7 +68,6 @@ public class RestrictionEvents implements Listener {
             if (!(e.getEntity() instanceof Player) && e.getEntity().getKiller() instanceof Player) {
                 Player p = e.getEntity().getKiller();
                 if (!p.hasPermission("BattleKits.bypassRestriction.disable-mob-xp")) {
-
                     e.setDroppedExp(0);
                 }
             }
@@ -82,11 +76,9 @@ public class RestrictionEvents implements Listener {
 
     @EventHandler
     public void blockBreak(BlockBreakEvent e) {
-
         if (!e.getPlayer().hasPermission("BattleKits.bypassRestriction.disable-block-xp") && !e.isCancelled()) {
             e.setExpToDrop(0);
         }
-
         if (!e.getPlayer().hasPermission("BattleKits.bypassRestriction.disable-block-break") && !e.isCancelled()) {
             e.setCancelled(true);
         }
@@ -96,7 +88,6 @@ public class RestrictionEvents implements Listener {
     @EventHandler
     public void invInteract(InventoryClickEvent e) {
         if (!e.getWhoClicked().hasPermission("BattleKits.bypassRestriction.disable-inventory-click") && !e.isCancelled()) {
-
             e.setCancelled(true);
         }
     }
@@ -105,7 +96,6 @@ public class RestrictionEvents implements Listener {
     public void onPlayerFoodLevelChange(FoodLevelChangeEvent e) {
         Player p = (Player) e.getEntity();
         if (p.hasPermission("BattleKits.disableFoodChange")) {
-
             e.setCancelled(true);
         }
     }

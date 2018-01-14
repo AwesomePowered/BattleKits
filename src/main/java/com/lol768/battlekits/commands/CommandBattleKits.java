@@ -50,7 +50,7 @@ public class CommandBattleKits implements CommandExecutor {
                         s = ChatColor.RED + s + ChatColor.RESET;
                     }
                     if (plugin.kits.getConfig().contains("kits." + ChatColor.stripColor(s) + ".cost")) {
-                        s = s + " (" + plugin.kits.getConfig().getDouble("kits." + ChatColor.stripColor(s) + ".cost") + ")"; //Builds list of kits incl. cost of each
+                        s += " (" + plugin.kits.getConfig().getDouble("kits." + ChatColor.stripColor(s) + ".cost") + ")"; //Builds list of kits incl. cost of each
                     }
 
                     kit_ref = kit_ref + s + ", "; //Add new kit info to String
@@ -336,15 +336,6 @@ public class CommandBattleKits implements CommandExecutor {
             int remaining = required % divisor;
             ExperienceOrb orbRemaining = (ExperienceOrb) p.getWorld().spawnEntity(p.getEyeLocation().add(0, 3, 0), EntityType.EXPERIENCE_ORB);
             orbRemaining.setExperience(remaining);
-        }
-
-        /**
-         * Handles TagAPI stuff
-         */
-        if (plugin.kits.getConfig().contains("kits." + className + ".tagPrefix") && plugin.useTags) {
-            plugin.getLogger().info("TagAPI support removed pending native 1.5 API");
-
-
         }
 
         /**

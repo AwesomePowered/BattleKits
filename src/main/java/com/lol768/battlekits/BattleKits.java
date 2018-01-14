@@ -2,7 +2,6 @@ package com.lol768.battlekits;
 
 import com.lol768.battlekits.listeners.RespawnKit;
 import com.lol768.battlekits.listeners.SignHandler;
-import com.lol768.battlekits.utilities.Updater;
 import com.lol768.battlekits.utilities.ConfigAccessor;
 import com.lol768.battlekits.utilities.PM;
 import com.lol768.battlekits.listeners.RestrictionEvents;
@@ -14,7 +13,6 @@ import com.lol768.battlekits.commands.CommandRefillAll;
 import com.lol768.battlekits.commands.CommandKitCreation;
 import com.lol768.battlekits.commands.CommandBattleKits;
 import com.lol768.battlekits.commands.CommandSoup;
-import com.lol768.battlekits.utilities.Updater.UpdateResult;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -154,7 +152,6 @@ public class BattleKits extends JavaPlugin {
         if (r.transactionSuccess()) {
             this.PM.notify(p, "Purchase successful! You spent " + amount + " and now have " + r.balance);
             return true;
-
         } else {
             this.PM.warn(p, "You don't have enough money! The kit costs " + amount + " and you have " + r.balance);
         }
@@ -221,16 +218,6 @@ public class BattleKits extends JavaPlugin {
         getCommand("toolkit").setExecutor(new CommandKitCreation(this));
         getCommand("fillall").setExecutor(new CommandRefillAll(this));
 
-        if (global.getConfig().getBoolean("settings.auto-update")) {
-            @SuppressWarnings("unused")
-            Updater updater = new Updater(this, "battlekits", this.getFile(), Updater.UpdateType.DEFAULT, true); // New slug
-            if(updater.getResult() == UpdateResult.SUCCESS) {
-                getLogger().log(Level.INFO, "[BattleKits] Updated to version {0}", updater.getLatestVersionString());
-            } else {
-                getLogger().log(Level.INFO, "[BattleKits] Is up to date!");
-            }
-        }
-
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
             this.getLogger().info("Vault found.");
             setupEconomy();
@@ -238,38 +225,10 @@ public class BattleKits extends JavaPlugin {
         } else {
             this.getLogger().info("Couldn't find Vault. Economy disabled for now.");
         }
-
-        if (Bukkit.getPluginManager().getPlugin("TagAPI") != null) {
-            this.getLogger().info("TagAPI found.");
-            getServer().getPluginManager().registerEvents(new TagHandler(this), this);
-            useTags = true;
-        } else {
-            this.getLogger().info("Disabling tag functionality as TagAPI is not installed.");
-        }
         getCommand("battlekits").setExecutor(cbk);
     }
 
     public ItemStack setColor(ItemStack item, int color) {
-        /*CraftItemStack craftStack = null;
-         net.minecraft.server.v1_4_5.ItemStack itemStack = null;
-
-         if (item instanceof CraftItemStack) {
-         craftStack = (CraftItemStack) item;
-         itemStack = craftStack.getHandle();
-         } else if (item instanceof ItemStack) {
-         craftStack = new CraftItemStack(item);
-         itemStack = craftStack.getHandle();
-         }
-         NBTTagCompound tag = itemStack.tag;
-
-         if (tag == null) {
-         tag = new NBTTagCompound();
-         tag.setCompound("display", new NBTTagCompound());
-         itemStack.tag = tag;
-         }
-         tag = itemStack.tag.getCompound("display");
-         tag.setInt("color", color);
-         itemStack.tag.setCompound("display", tag);*/
         LeatherArmorMeta im = (LeatherArmorMeta) item.getItemMeta();
         im.setColor(Color.fromRGB(color));
         item.setItemMeta(im);

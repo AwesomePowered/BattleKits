@@ -4,7 +4,7 @@ kits:
     on-give-message: '&cGo and shoot some targets!'
     cost: 5
     xpLevels: 5
-    tagPrefix: '&a' #Tag prefix for overhead colors 
+    tagPrefix: '&a' #Tag prefix for overhead colors
     commands: #Executed on kit give
       - 'tell <player> Enjoy your kit :)'
     items:

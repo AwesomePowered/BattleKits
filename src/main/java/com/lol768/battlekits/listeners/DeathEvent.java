@@ -24,10 +24,12 @@ public class DeathEvent implements Listener {
         if (e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
             for (ItemStack armour : p.getInventory().getArmorContents()) {
-                if (armour.hasItemMeta()) {
-                    if (armour.getItemMeta().hasDisplayName()) {
-                        if (armour.getItemMeta().getDisplayName().startsWith(ChatColor.RESET + "" + ChatColor.RESET)) {
-                            armour.setDurability((short) 0);
+                if (armour != null) {
+                    if (armour.hasItemMeta()) {
+                        if (armour.getItemMeta().hasDisplayName()) {
+                            if (armour.getItemMeta().getDisplayName().startsWith(ChatColor.RESET + "" + ChatColor.RESET)) {
+                                armour.setDurability((short) 0);
+                            }
                         }
                     }
                 }
