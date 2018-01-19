@@ -24,7 +24,7 @@ public class CommandSoup implements CommandExecutor {
                 return true;
             }
             Player p = (Player) sender;
-            ItemStack i = p.getItemInHand();
+            ItemStack i = p.getInventory().getItemInMainHand();
 
             if (sender.hasPermission("battlekits.use.soup")) {
                 //TODO: @MapleFighter -- implement whole inventory
@@ -33,7 +33,7 @@ public class CommandSoup implements CommandExecutor {
                     return true;
 
                 } else {
-                    i.setType(Material.MUSHROOM_SOUP);
+                    i.setType(Material.valueOf(plugin.global.getConfig().getString("instant-soup-drink.type")));
                     return true;
                 }
 

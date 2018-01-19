@@ -1,8 +1,6 @@
 package com.lol768.battlekits.listeners;
 
 import com.lol768.battlekits.BattleKits;
-import com.lol768.battlekits.BattleKits;
-import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
@@ -13,6 +11,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.logging.Level;
 
 public class SignHandler implements Listener {
 
@@ -25,7 +25,7 @@ public class SignHandler implements Listener {
     @EventHandler
     public void signClick(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock() != null && (e.getClickedBlock().getType() == Material.WALL_SIGN || e.getClickedBlock().getType() == Material.SIGN_POST)) {
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock() != null && (e.getClickedBlock().getType() == Material.WALL_SIGN || e.getClickedBlock().getType() == Material.SIGN)) {
 
             Sign s = (Sign) e.getClickedBlock().getState();
             String[] lines = s.getLines();
@@ -48,7 +48,7 @@ public class SignHandler implements Listener {
                             if (rez) {
                                 for (ItemStack i : p.getInventory().getContents()) {
                                     if (i == null) {
-                                        p.getInventory().addItem(new ItemStack(Material.MUSHROOM_SOUP, 1));
+                                        p.getInventory().addItem(new ItemStack(Material.valueOf(plugin.global.getConfig().getString("instant-soup-drink.type")), 1));
                                     }
                                 }
                             }

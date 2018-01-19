@@ -29,9 +29,9 @@ public class CommandRefillAll implements CommandExecutor {
             if (sender.hasPermission("battlekits.use.fillall")) {
                 //Get array of itemstack
                 for (ItemStack slot : inv) {
-                    if (slot != null && slot.getType() == Material.BOWL) { //Check for NPE 
+                    if (slot != null && slot.getType() == Material.BOWL) { //Check for NPE
                         gotBowl = true;
-                        slot.setType(Material.MUSHROOM_SOUP);
+                        slot.setType(Material.valueOf(plugin.global.getConfig().getString("instant-soup-drink.type")));
                     }
                 }
 

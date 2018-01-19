@@ -46,8 +46,6 @@ public class PlayerReward implements Listener {
 
     /**
      * This event handles PvP rewards + kill streaks
-     *
-     * @param event
      */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
@@ -58,11 +56,10 @@ public class PlayerReward implements Listener {
 
         if (dead.getKiller() != null && dead.getKiller() instanceof Player) {
             Player attacker = dead.getKiller();
-            attacker = (Player) dead.getKiller();
             String name = attacker.getName();
             if ((boolean) plugin.checkSetting("killStreaks.enabled", attacker, false)) {
                 int val = 1;
-                val = val + this.plugin.kitHistory.getConfig().getInt("killStreaks." + attacker.getName());
+                val += this.plugin.kitHistory.getConfig().getInt("killStreaks." + attacker.getName());
                 this.plugin.kitHistory.getConfig().set("killStreaks." + attacker.getName(), val);
                 if (plugin.checkList("killStreaks.action" + val, attacker) != null) {
                     this.processActions(plugin.checkList("killStreaks.action" + val, attacker), attacker, val);
@@ -72,14 +69,13 @@ public class PlayerReward implements Listener {
                         this.processActions(plugin.checkList("killStreaks.actionDefault", attacker), attacker, val);
                     }
                 }
-            } else {
             }
 
             if (plugin.global.getConfig().contains((dead.getWorld().getName() + ".rewards.killCommands")) && !(dead.getKiller().getName().equals(dead.getName()))) {
                 List<String> commands = this.plugin.global.getConfig().getStringList(dead.getWorld().getName() + ".rewards.killCommands");
 
                 for (String s : commands) {
-                    s = s.replace("<player>", name);
+                    s = s.replace("<player>", name).replace("/", "");
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), s);
                 }
 

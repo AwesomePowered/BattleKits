@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.lol768.battlekits.utilities.MaterialMap;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -53,7 +55,7 @@ public class CommandBattleKits implements CommandExecutor {
                         s += " (" + plugin.kits.getConfig().getDouble("kits." + ChatColor.stripColor(s) + ".cost") + ")"; //Builds list of kits incl. cost of each
                     }
 
-                    kit_ref = kit_ref + s + ", "; //Add new kit info to String
+                    kit_ref += s + ", "; //Add new kit info to String
                 }
                 kit_ref = kit_ref.substring(0, kit_ref.length() - 2); //remove last comma and space
                 plugin.PM.notify(sender, "Available kits (cost): "); //Header for info
@@ -150,13 +152,12 @@ public class CommandBattleKits implements CommandExecutor {
     /**
      * Parse custom potion strings
      * @param str - string in format effect:power:duration
-     *            effects: http://jd.bukkit.org/rb/apidocs/org/bukkit/potion/PotionEffectType.html
+     *            effects: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html
      *            power: -127 to 128
      *            duration: seconds
      * @throws Exception - invalid potion string
      */
-    public ItemStack parsePotion(final ItemStack stack, final String str) throws Exception
-    {
+    public ItemStack parsePotion(final ItemStack stack, final String str) throws Exception {
         PotionEffectType potionEffectType;
         PotionEffect potionEffect;
         PotionMeta potionMeta;
@@ -215,6 +216,8 @@ public class CommandBattleKits implements CommandExecutor {
 
         return stack;
     }
+
+    //Todo Objectify kits
 
     /**
      * Big method that gives the player a specified kit
@@ -357,7 +360,13 @@ public class CommandBattleKits implements CommandExecutor {
                 String[] item = s[0].split(":");
 
                 //Sets the block/item
-                i.setTypeId(Integer.parseInt(item[0]));
+                if (StringUtils.isNumeric(item[0])) { //Because we all know people will never update their configs no matter/how much the errors.
+                    String material = MaterialMap.getById(item[0]).getLegacyType();
+                    i.setType(Material.valueOf(material));
+                    plugin.PM.warn(Bukkit.getConsoleSender(), "Please update your kits.yml! id: " + item[0] + " is now " + material);
+                } else {
+                    i.setType(Material.valueOf(item[0]));
+                }
 
                 //Sets the amount, durability, custom potions
                 if (item.length > 1) {
@@ -421,144 +430,38 @@ public class CommandBattleKits implements CommandExecutor {
         String getLeggings = plugin.kits.getConfig().getString("kits." + className + ".items" + ".leggings");
         String getBoots = plugin.kits.getConfig().getString("kits." + className + ".items" + ".boots");
 
-
-
         //These hold the chosen colours for dying
         int helmColor = 0;
         int chestColor = 0;
         int legColor = 0;
         int bootColor = 0;
 
-        /**
-         * Main item stacks for various armour types. They will not necessarily
-         * all be used, only those that the user wishes to use and has defined
-         * in the config.
-         */
-        ItemStack lhelmet = new ItemStack(Material.LEATHER_HELMET);
-        ItemStack lchestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
-        ItemStack lleggings = new ItemStack(Material.LEATHER_LEGGINGS);
-        ItemStack lboots = new ItemStack(Material.LEATHER_BOOTS);
-
-        ItemStack ihelmet = new ItemStack(Material.IRON_HELMET, 1);
-        ItemStack ichestplate = new ItemStack(Material.IRON_CHESTPLATE, 1);
-        ItemStack ileggings = new ItemStack(Material.IRON_LEGGINGS, 1);
-        ItemStack iboots = new ItemStack(Material.IRON_BOOTS, 1);
-
-        ItemStack ghelmet = new ItemStack(Material.GOLD_HELMET, 1);
-        ItemStack gchestplate = new ItemStack(Material.GOLD_CHESTPLATE, 1);
-        ItemStack gleggings = new ItemStack(Material.GOLD_LEGGINGS, 1);
-        ItemStack gboots = new ItemStack(Material.GOLD_BOOTS, 1);
-
-        ItemStack dhelmet = new ItemStack(Material.DIAMOND_HELMET, 1);
-        ItemStack dchestplate = new ItemStack(Material.DIAMOND_CHESTPLATE, 1);
-        ItemStack dleggings = new ItemStack(Material.DIAMOND_LEGGINGS, 1);
-        ItemStack dboots = new ItemStack(Material.DIAMOND_BOOTS, 1);
-
-        ItemStack chelmet = new ItemStack(Material.CHAINMAIL_HELMET);
-        ItemStack cchestplate = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
-        ItemStack cleggings = new ItemStack(Material.CHAINMAIL_LEGGINGS);
-        ItemStack cboots = new ItemStack(Material.CHAINMAIL_BOOTS);
-
         //ItemStack for final armour items
-        ItemStack finalHelmet = null;
-        ItemStack finalChestplate = null;
-        ItemStack finalLeggings = null;
-        ItemStack finalBoots = null;
+        //Now uses Material enums
+        ItemStack finalHelmet = new ItemStack(Material.valueOf(getHelmet.toUpperCase()));
+        ItemStack finalChestplate = new ItemStack(Material.valueOf(getChestplate.toUpperCase()));
+        ItemStack finalLeggings = new ItemStack(Material.valueOf(getLeggings.toUpperCase()));
+        ItemStack finalBoots = new ItemStack(Material.valueOf(getBoots.toUpperCase()));
 
         //Dying leather armour
         if (plugin.kits.getConfig().contains("kits." + className + ".items" + ".helmetColor")) {
             helmColor = Integer.parseInt(plugin.kits.getConfig().getString("kits." + className + ".items.helmetColor").replace("#", ""), 16);
-            lhelmet = this.plugin.setColor(lhelmet, helmColor);
+            finalHelmet = plugin.setColor(finalHelmet, helmColor);
         }
 
         if (plugin.kits.getConfig().contains("kits." + className + ".items" + ".chestplateColor")) {
             chestColor = Integer.parseInt(plugin.kits.getConfig().getString("kits." + className + ".items.chestplateColor").replace("#", ""), 16);
-            lchestplate = this.plugin.setColor(lchestplate, chestColor);
+            finalChestplate = plugin.setColor(finalChestplate, chestColor);
         }
 
         if (plugin.kits.getConfig().contains("kits." + className + ".items" + ".leggingColor")) {
             legColor = Integer.parseInt(plugin.kits.getConfig().getString("kits." + className + ".items.leggingColor").replace("#", ""), 16);
-            lleggings = this.plugin.setColor(lleggings, legColor);
+            finalLeggings = plugin.setColor(finalLeggings, legColor);
         }
 
         if (plugin.kits.getConfig().contains("kits." + className + ".items" + ".bootColor")) {
             bootColor = Integer.parseInt(plugin.kits.getConfig().getString("kits." + className + ".items.bootColor").replace("#", ""), 16);
-            lboots = this.plugin.setColor(lboots, bootColor);
-        }
-
-        //Determine which type of armour they want to use
-        if (getHelmet != null) {
-            if (getHelmet.equals("leather")) {
-                finalHelmet = lhelmet;
-            }
-            if (getHelmet.equals("iron")) {
-                finalHelmet = ihelmet;
-            }
-            if (getHelmet.equals("gold")) {
-                finalHelmet = ghelmet;
-            }
-            if (getHelmet.equals("diamond")) {
-                finalHelmet = dhelmet;
-            }
-            if (getHelmet.equals("chainmail") || getHelmet.equals("chain")) {
-                finalHelmet = chelmet;
-            }
-
-        }
-
-        if (getChestplate != null) {
-            if (getChestplate.equals("leather")) {
-                finalChestplate = lchestplate;
-            }
-            if (getChestplate.equals("iron")) {
-                finalChestplate = ichestplate;
-            }
-            if (getChestplate.equals("gold")) {
-                finalChestplate = gchestplate;
-            }
-            if (getChestplate.equals("diamond")) {
-                finalChestplate = dchestplate;
-            }
-            if (getChestplate.equals("chainmail") || getHelmet.equals("chain"))  {
-                finalChestplate = cchestplate;
-            }
-
-        }
-
-        if (getLeggings != null) {
-            if (getLeggings.equals("leather")) {
-                finalLeggings = lleggings;
-            }
-            if (getLeggings.equals("iron")) {
-                finalLeggings = ileggings;
-            }
-            if (getLeggings.equals("gold")) {
-                finalLeggings = gleggings;
-            }
-            if (getLeggings.equals("diamond")) {
-                finalLeggings = dleggings;
-            }
-            if (getLeggings.equals("chainmail") || getHelmet.equals("chain"))  {
-                finalLeggings = cleggings;
-            }
-        }
-
-        if (getBoots != null) {
-            if (getBoots.equals("leather")) {
-                finalBoots = lboots;
-            }
-            if (getBoots.equals("iron")) {
-                finalBoots = iboots;
-            }
-            if (getBoots.equals("gold")) {
-                finalBoots = gboots;
-            }
-            if (getBoots.equals("diamond")) {
-                finalBoots = dboots;
-            }
-            if (getBoots.equals("chainmail") || getHelmet.equals("chain"))  {
-                finalBoots = cboots;
-            }
+            finalBoots = plugin.setColor(finalBoots, bootColor);
         }
 
         short s1 = (short) plugin.kits.getConfig().getInt("kits." + className + ".items.helmetDurability", -2);
@@ -643,8 +546,6 @@ public class CommandBattleKits implements CommandExecutor {
                 finalHelmet.addUnsafeEnchantment(enchantmentInt, levelInt);
             }
         }
-
-
 
         if (plugin.kits.getConfig().contains("kits." + className + ".items.chestplateEnchant") && finalChestplate != null) {
             for (String a : plugin.kits.getConfig().getString("kits." + className + ".items.chestplateEnchant").split(" ")) {

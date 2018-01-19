@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.lol768</groupId>
     <artifactId>BattleKits</artifactId>
-    <version>2.1.1</version>
+    <version>2.1.1-A0.1</version>
     <name>BattleKits</name>
     <description>BattleKits, with added Maven.</description>
     <build>
@@ -64,6 +64,10 @@
         <repository>
             <id>bstats-repo</id>
             <url>http://repo.bstats.org/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>mvdw</id>
+            <url>http://repo.mvdw-software.be/content/groups/public/</url>
         </repository>
     </repositories>
     <dependencies>

@@ -7,12 +7,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 
 public class RestrictionEvents implements Listener {
 
@@ -35,8 +35,9 @@ public class RestrictionEvents implements Listener {
     }
 
     @EventHandler
-    public void pickup(PlayerPickupItemEvent e) {
-        if (!e.getPlayer().hasPermission("BattleKits.bypassRestriction.disable-pickup-items") && !e.isCancelled()) {
+    public void pickup(EntityPickupItemEvent e) {
+        if (!(e instanceof Player)) return;
+        if (!e.getEntity().hasPermission("BattleKits.bypassRestriction.disable-pickup-items") && !e.isCancelled()) {
             e.setCancelled(true);
         }
     }

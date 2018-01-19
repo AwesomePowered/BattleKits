@@ -40,9 +40,10 @@ public class DeathEvent implements Listener {
 
     @EventHandler
     public void onUse(PlayerInteractEvent e) {
-        if (e.getPlayer().getItemInHand() != null && e.getPlayer().getItemInHand().getItemMeta() != null && e.getPlayer().getItemInHand().getItemMeta().getDisplayName() != null) {
-            if (e.getPlayer().getItemInHand().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + "" + ChatColor.RESET)) {
-                e.getPlayer().getItemInHand().setDurability((short) 0);
+        ItemStack mainHand = e.getPlayer().getInventory().getItemInMainHand();
+        if (mainHand != null && mainHand.getItemMeta() != null && mainHand.getItemMeta().getDisplayName() != null) {
+            if (mainHand.getItemMeta().getDisplayName().startsWith(ChatColor.RESET + "" + ChatColor.RESET)) {
+                mainHand.setDurability((short) 0);
             }
         }
     }
@@ -54,9 +55,8 @@ public class DeathEvent implements Listener {
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (event.getEntity() instanceof Player) {
-            final Player p = (Player) event.getEntity();
-            Integer i = 0;
+        if (event.getEntity() != null) {
+            final Player p = event.getEntity();
             if (plugin.kitHistory.getConfig().contains("dead." + p.getName())) {
 
                 if ((boolean) plugin.checkSetting("settings.once-per-life", p, false)) {
@@ -64,12 +64,7 @@ public class DeathEvent implements Listener {
                 }
 
                 if ((boolean) plugin.checkSetting("settings.show-kit-info-on-respawn", p, false)) {
-                    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                        @Override
-                        public void run() {
-                            plugin.PM.notify(p, "You may now use a kit");
-                        }
-                    }, 60L);
+                    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.PM.notify(p, "You may now use a kit"), 60L);
 
                 }
 

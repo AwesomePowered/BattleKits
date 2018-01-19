@@ -3,14 +3,13 @@ package com.lol768.battlekits;
 import com.lol768.battlekits.listeners.RespawnKit;
 import com.lol768.battlekits.listeners.SignHandler;
 import com.lol768.battlekits.utilities.ConfigAccessor;
+import com.lol768.battlekits.utilities.Converter;
 import com.lol768.battlekits.utilities.PM;
 import com.lol768.battlekits.listeners.RestrictionEvents;
 import com.lol768.battlekits.listeners.PlayerReward;
-import com.lol768.battlekits.listeners.TagHandler;
 import com.lol768.battlekits.listeners.InstaSoup;
 import com.lol768.battlekits.listeners.DeathEvent;
 import com.lol768.battlekits.commands.CommandRefillAll;
-import com.lol768.battlekits.commands.CommandKitCreation;
 import com.lol768.battlekits.commands.CommandBattleKits;
 import com.lol768.battlekits.commands.CommandSoup;
 import java.io.File;
@@ -18,7 +17,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -33,18 +31,16 @@ public class BattleKits extends JavaPlugin {
 
     public static net.milkbowl.vault.economy.Economy economy = null;
     public String html = "Error";
-    public HashSet<String> death = new HashSet<>();
-    public HashMap<String, String> tags = new HashMap<>(); //Name, prefix (colour codes)
     public CommandBattleKits cbk = new CommandBattleKits(this);
-    public boolean useTags = false;
     public PM PM = new PM(this);
     public ConfigAccessor global;
     public ConfigAccessor kits;
     public ConfigAccessor kitHistory;
-    private Metrics metrics;
+    public static String legacyType;
 
     @Override
     public void onEnable() {
+        legacyType = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].split("R")[0];
         if (!createDataDirectory()) {
             this.getLogger().severe("Couldn't create BattleKits data folder. Shutting down...");
             this.setEnabled(false);
@@ -53,6 +49,9 @@ public class BattleKits extends JavaPlugin {
         html = convertStreamToString(page);
         makeConfigs();
         startMetrics();
+        if (!global.getConfig().getBoolean("settings.converted")) {
+            new Converter(this).convert();
+        }
     }
 
     @Override
@@ -69,16 +68,16 @@ public class BattleKits extends JavaPlugin {
     }
 
     private void startMetrics() {
-        metrics = new Metrics(this);
+        Metrics metrics = new Metrics(this);
     }
 
     /**
      * Multi-world config accessor
      *
-     * @param String path - The setting path to look for (e.g.
+     * String path - The setting path to look for (e.g.
      * settings.disable-xp)
-     * @param Player p - Player to get world from
-     * @param Object defaultValue - If empty, use this value
+     * Player p - Player to get world from
+     * Object defaultValue - If empty, use this value
      * @return Object - result
      */
     public Object checkSetting(String path, Player p, Object defaultValue) {
@@ -97,10 +96,10 @@ public class BattleKits extends JavaPlugin {
     /**
      * Multi-world config accessor
      *
-     * @param String path - The setting path to look for (e.g.
+     * String path - The setting path to look for (e.g.
      * settings.disable-xp)
-     * @param Player p - Player to get world from
-     * @param Object defaultValue - If empty, use this
+     * Player p - Player to get world from
+     * Object defaultValue - If empty, use this
      * @return Object - resultant list
      */
     public List<String> checkList(String path, Player p) {
@@ -119,10 +118,9 @@ public class BattleKits extends JavaPlugin {
     /**
      * Multi-world config accessor -- accepts world name instead of Player
      *
-     * @param String path - The setting path to look for (e.g.
-     * settings.disable-xp)
-     * @param String world - World to check
-     * @param Object defaultValue - If empty, use this
+     * String path - The setting path to look for (e.g.settings.disable-xp)
+     * path String world - World to check
+     * Object defaultValue - If empty, use this
      * @return Object - result
      */
     public Object checkSetting(String path, String world, Object defaultValue) {
@@ -199,25 +197,21 @@ public class BattleKits extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new SignHandler(this), this);
         }
 
-
         getServer().getPluginManager().registerEvents(new RespawnKit(this), this);
         getServer().getPluginManager().registerEvents(new PlayerReward(this), this);
+        getServer().getPluginManager().registerEvents(new InstaSoup(this), this);
 
         if (global.getConfig().getBoolean("settings.enable-restrictions")) {
             getServer().getPluginManager().registerEvents(new RestrictionEvents(this), this);
             getLogger().info("Restrictions enabled. Use permissions to setup");
-
-
         } else {
             getLogger().info("Not enabling restrictions due to config setting");
         }
-        getServer().getPluginManager()
-                .registerEvents(new InstaSoup(this), this);
 
-        getCommand("soup").setExecutor(new CommandSoup(this));
-        getCommand("toolkit").setExecutor(new CommandKitCreation(this));
+        //getCommand("toolkit").setExecutor(new CommandKitCreation(this)); Don't register commands we don't use
         getCommand("fillall").setExecutor(new CommandRefillAll(this));
-
+        getCommand("soup").setExecutor(new CommandSoup(this));
+        getCommand("battlekits").setExecutor(cbk);
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
             this.getLogger().info("Vault found.");
             setupEconomy();
@@ -225,10 +219,12 @@ public class BattleKits extends JavaPlugin {
         } else {
             this.getLogger().info("Couldn't find Vault. Economy disabled for now.");
         }
-        getCommand("battlekits").setExecutor(cbk);
     }
 
     public ItemStack setColor(ItemStack item, int color) {
+        if (!item.getType().toString().contains("LEATHER"))  {
+            return item;
+        }
         LeatherArmorMeta im = (LeatherArmorMeta) item.getItemMeta();
         im.setColor(Color.fromRGB(color));
         item.setItemMeta(im);

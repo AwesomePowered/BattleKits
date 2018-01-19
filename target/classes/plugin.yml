@@ -1,6 +1,6 @@
 name: BattleKits
 main: com.lol768.battlekits.BattleKits
-version: 2.1.1
+version: 2.1.1-A0.1-b${build.number}
 author: np98765
 authors: ['lol768', 'MapleFighter777', 'drtshock', 'Lolmewn', 'LaxWasHere']
 softdepend: [Vault]
@@ -17,6 +17,3 @@ commands:
     usage: /<command>
     description: Refills all soup in inventory
     aliases: [fullsoup]
-  toolkit:
-    usage: /<command> [action]
-    description: Allows creation of kits with what is in the inventory. Not yet written.

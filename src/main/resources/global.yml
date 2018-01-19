@@ -1,21 +1,18 @@
 #Global BattleKits settings
 #Ignored if world-specific config exists
 brand: "BattleKits"
-server:
-  enabled: false
-  port: 8080
-  server-name: "BattleKits"
-  server-description: "A BattleKits server"
 settings:
   once-per-life: true
   auto-update: false #Ignored by world-specific config
   enable-restrictions: false #Ignored by world-specific config
   show-kit-info-on-respawn: true
-  override-disable-respawn-kits: false
+  override-disable-respawn-kits: true
   instant-soup-drink: false
   clear-default: false
+  converted: false #Is the kits.yml converted to Material enum
 instant-soup-drink:
-  replenish-type: hunger #Could be health
+  type: 'MUSHROOM_SOUP' #MUSHROOM_STEW 1.13+
+  replenish-type: hunger #Could be hunger/health
 signs:
   enabled: true
   ignore-permissions: false
