@@ -40,9 +40,7 @@ public class PM {
 
         if (type.equals("warn") || type.equals("warning")) {
             plugin.getLogger().warning(message);
-
             return;
-
         }
 
         if (type.equals("error") || type.equals("severe")) {

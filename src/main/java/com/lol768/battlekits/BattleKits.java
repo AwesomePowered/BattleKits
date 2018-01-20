@@ -14,9 +14,9 @@ import com.lol768.battlekits.commands.CommandBattleKits;
 import com.lol768.battlekits.commands.CommandSoup;
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -30,7 +30,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class BattleKits extends JavaPlugin {
 
     public static net.milkbowl.vault.economy.Economy economy = null;
-    public String html = "Error";
     public CommandBattleKits cbk = new CommandBattleKits(this);
     public PM PM = new PM(this);
     public ConfigAccessor global;
@@ -46,7 +45,6 @@ public class BattleKits extends JavaPlugin {
             this.setEnabled(false);
         }
         InputStream page = getResource("page.txt");
-        html = convertStreamToString(page);
         makeConfigs();
         startMetrics();
         if (!global.getConfig().getBoolean("settings.converted")) {
@@ -229,5 +227,9 @@ public class BattleKits extends JavaPlugin {
         im.setColor(Color.fromRGB(color));
         item.setItemMeta(im);
         return item;
+    }
+
+    public void debug(Object... o) {
+        getLogger().log(Level.INFO, Arrays.toString(o));
     }
 }

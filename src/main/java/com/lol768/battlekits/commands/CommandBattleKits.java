@@ -1,6 +1,8 @@
 package com.lol768.battlekits.commands;
 
 import com.lol768.battlekits.BattleKits;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -151,69 +153,24 @@ public class CommandBattleKits implements CommandExecutor {
 
     /**
      * Parse custom potion strings
-     * @param str - string in format effect:power:duration
-     *            effects: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html
-     *            power: -127 to 128
+     * @param data - string[] contains effect:power:duration
+     *            effects: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html
      *            duration: seconds
-     * @throws Exception - invalid potion string
+     *            amplifier: -127 to 128
+     *
      */
-    public ItemStack parsePotion(final ItemStack stack, final String str) throws Exception {
-        PotionEffectType potionEffectType;
-        PotionEffect potionEffect;
-        PotionMeta potionMeta;
-        int power, duration;
-
-        final String[] split = str.split(":");
-        int splitIndex = -1;
-
-        if (split.length < 3) {
-            throw new Exception("Not enough arguments");
-        }
-
-        //set index at the effect position
-        for(int i=0; i<split.length; i++) {
-            if(!NumberUtils.isNumber(split[i])) {
-                splitIndex = i;
+    public ItemStack parsePotion(final ItemStack stack, final String[] data) {
+        PotionMeta potionMeta = (PotionMeta) stack.getItemMeta();
+        for (int i = 1; i < data.length; i++) {
+            String[] potionData = data[i].split(":");
+            if (potionData.length <= 2) {
+                return stack;
+            }
+            if (PotionEffectType.getByName(potionData[0]) != null && StringUtils.isNumeric(potionData[1]) && StringUtils.isNumeric(potionData[2])) { //make prtty l8r
+                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.getByName(potionData[0]), Integer.parseInt(potionData[1]), Integer.parseInt(potionData[2])), true);
             }
         }
-
-        if(splitIndex < 0) {
-            throw new Exception("No potion effect name found");
-        }
-
-        //parse potion effect
-        potionEffectType = PotionEffectType.getByName(split[splitIndex]);
-        if (potionEffectType == null || potionEffectType.getName() == null) {
-            throw new Exception("Invalid potion effect");
-        }
-
-        //parse potion power
-        if (NumberUtils.isNumber(split[splitIndex+1])) {
-            power = Integer.parseInt(split[splitIndex+1]);
-            if (power > 0 && power < 4) {
-                power -= 1;
-            }
-        } else {
-            throw new Exception("Invalid potion power");
-        }
-
-        //parse potion duration (in seconds)
-        if (NumberUtils.isNumber(split[splitIndex+2])) {
-            duration = Integer.parseInt(split[splitIndex+2]) * 20;
-
-            //don't know why, but splash potions are 40 ticks per seconds
-            if(Potion.fromItemStack(stack).isSplash()) {
-                duration *= 2;
-            }
-        } else {
-            throw new Exception("Invalid potion duration");
-        }
-
-        potionMeta = (PotionMeta)stack.getItemMeta();
-        potionEffect = potionEffectType.createEffect(duration, power);
-        potionMeta.addCustomEffect(potionEffect, true);
         stack.setItemMeta(potionMeta);
-
         return stack;
     }
 
@@ -376,19 +333,13 @@ public class CommandBattleKits implements CommandExecutor {
                         if(NumberUtils.isNumber(item[2])) {
                             i.setDurability((short) Integer.parseInt(item[2]));
                         }
-
-                        if(item.length > 3 && i.getType().equals(Material.POTION)) {
-                            try {
-                                i = parsePotion(i, s[0]);
-                            }
-                            catch (Exception e) {
-                                plugin.getLogger().warning("Could not parse custom potion: "+e.getMessage());
-                            }
-                        }
                     }
-
                 } else {
                     i.setAmount(1); //Default amount is 1
+                }
+
+                if (i.getType().toString().contains("POTION") && s.length >= 2) {
+                    i = parsePotion(i, s);
                 }
 
                 if (plugin.kits.getConfig().contains("kits." + className + ".items" + ".names." + slot)) {
@@ -409,7 +360,7 @@ public class CommandBattleKits implements CommandExecutor {
                 // Sets the enchantments and level
                 Boolean first = true;
 
-                if (s.length > 1) {
+                if (s.length > 1 && !i.getType().toString().contains("POTION")) {
                     for (String a : s) {
                         if (!first) {
                             String[] enchant = a.split(":");
@@ -429,6 +380,7 @@ public class CommandBattleKits implements CommandExecutor {
         String getChestplate = plugin.kits.getConfig().getString("kits." + className + ".items" + ".chestplate");
         String getLeggings = plugin.kits.getConfig().getString("kits." + className + ".items" + ".leggings");
         String getBoots = plugin.kits.getConfig().getString("kits." + className + ".items" + ".boots");
+        String getOffHand = plugin.kits.getConfig().getString("kits." + className + ".items" + ".offhand");
 
         //These hold the chosen colours for dying
         int helmColor = 0;
@@ -438,10 +390,11 @@ public class CommandBattleKits implements CommandExecutor {
 
         //ItemStack for final armour items
         //Now uses Material enums
-        ItemStack finalHelmet = new ItemStack(Material.valueOf(getHelmet.toUpperCase()));
-        ItemStack finalChestplate = new ItemStack(Material.valueOf(getChestplate.toUpperCase()));
-        ItemStack finalLeggings = new ItemStack(Material.valueOf(getLeggings.toUpperCase()));
-        ItemStack finalBoots = new ItemStack(Material.valueOf(getBoots.toUpperCase()));
+        ItemStack finalHelmet = (getHelmet != null) ? new ItemStack(Material.valueOf(getHelmet.toUpperCase())) : null;
+        ItemStack finalChestplate = (getChestplate != null) ? new ItemStack(Material.valueOf(getChestplate.toUpperCase())) : null;
+        ItemStack finalLeggings = (getLeggings != null ) ? new ItemStack(Material.valueOf(getLeggings.toUpperCase())) : null;
+        ItemStack finalBoots = (getBoots != null) ? new ItemStack(Material.valueOf(getBoots.toUpperCase())) : null;
+        ItemStack finalOffHand = (getOffHand != null) ? new ItemStack(Material.valueOf(getOffHand.toUpperCase())) : null;
 
         //Dying leather armour
         if (plugin.kits.getConfig().contains("kits." + className + ".items" + ".helmetColor")) {
@@ -509,6 +462,13 @@ public class CommandBattleKits implements CommandExecutor {
             name = ChatColor.translateAlternateColorCodes('&', name);
             im.setDisplayName(name);
             finalBoots.setItemMeta(im);
+        }
+        if (plugin.kits.getConfig().contains("kits." + className + ".items.offhandName")) {
+            ItemMeta im = finalOffHand.getItemMeta();
+            String name = plugin.kits.getConfig().getString("kits." + className + ".items.offhandName");
+            name = ChatColor.translateAlternateColorCodes('&', name);
+            im.setDisplayName(name);
+            finalOffHand.setItemMeta(im);
         }
 
         if (s2 == -3) {
@@ -586,6 +546,10 @@ public class CommandBattleKits implements CommandExecutor {
         if (finalBoots != null) {
             p.getInventory().setBoots(finalBoots);
         }
+        if (finalOffHand != null) {
+            p.getInventory().setItemInOffHand(finalOffHand);
+        }
+
         p.updateInventory();
         if (plugin.global.getConfig().getBoolean("settings.once-per-life")) {
             plugin.kitHistory.getConfig().set("dead." + p.getName(), true);

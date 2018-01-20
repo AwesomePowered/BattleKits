@@ -22,8 +22,8 @@ public class Converter {
     }
 
     public void convert() {
-        debug();
-        debug("Starting conversion, legacyType:", BattleKits.legacyType);
+        plugin.debug();
+        plugin.debug("Starting conversion, legacyType:", BattleKits.legacyType);
         for (String className : kitsConfiguration.getConfigurationSection("kits").getKeys(false)) {
 
             for (String armor : armors) {
@@ -39,7 +39,7 @@ public class Converter {
                     String[] item = kitsConfiguration.getString("kits." + className + ".items." + slot).split(" ")[0].split(":");
                     if (StringUtils.isNumeric(item[0])) {
                         String newMaterial = slotContents.replaceFirst(item[0], MaterialMap.getFromLegacyId(item[0]));
-                        debug("Converting:"+className, "Slot:"+slot,"id:"+item[0],"enum:"+newMaterial);
+                        plugin.debug("Converting:"+className, "Slot:"+slot,"id:"+item[0],"enum:"+newMaterial);
                         plugin.kits.getConfig().set("kits."+className+".items."+slot, newMaterial);
                     }
                 }
@@ -48,11 +48,7 @@ public class Converter {
         plugin.global.getConfig().set("settings.converted", true);
         plugin.kits.saveConfig();
         plugin.global.saveConfig();
-        debug("Conversion complete!");
-    }
-
-    public void debug(Object... o) {
-        plugin.getLogger().log(Level.INFO, Arrays.toString(o));
+        plugin.debug("Conversion complete!");
     }
 
 }
