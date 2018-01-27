@@ -2,13 +2,7 @@ package com.lol768.battlekits.utilities;
 
 import com.lol768.battlekits.BattleKits;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Bat;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.logging.Level;
 
 public class Converter {
 

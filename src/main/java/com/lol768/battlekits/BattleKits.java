@@ -13,7 +13,6 @@ import com.lol768.battlekits.commands.CommandRefillAll;
 import com.lol768.battlekits.commands.CommandBattleKits;
 import com.lol768.battlekits.commands.CommandSoup;
 import java.io.File;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -44,7 +43,6 @@ public class BattleKits extends JavaPlugin {
             this.getLogger().severe("Couldn't create BattleKits data folder. Shutting down...");
             this.setEnabled(false);
         }
-        InputStream page = getResource("page.txt");
         makeConfigs();
         startMetrics();
         if (!global.getConfig().getBoolean("settings.converted")) {
@@ -191,13 +189,19 @@ public class BattleKits extends JavaPlugin {
 
     public void postStartup() {
         getServer().getPluginManager().registerEvents(new DeathEvent(this), this);
+        getServer().getPluginManager().registerEvents(new RespawnKit(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerReward(this), this);
+        getServer().getPluginManager().registerEvents(new InstaSoup(this), this);
+
+        //getCommand("toolkit").setExecutor(new CommandKitCreation(this)); Don't register commands we don't use
+        getCommand("fillall").setExecutor(new CommandRefillAll(this));
+        getCommand("soup").setExecutor(new CommandSoup(this));
+        getCommand("battlekits").setExecutor(cbk);
+
         if (global.getConfig().getBoolean("signs.enabled")) {
             getServer().getPluginManager().registerEvents(new SignHandler(this), this);
         }
 
-        getServer().getPluginManager().registerEvents(new RespawnKit(this), this);
-        getServer().getPluginManager().registerEvents(new PlayerReward(this), this);
-        getServer().getPluginManager().registerEvents(new InstaSoup(this), this);
 
         if (global.getConfig().getBoolean("settings.enable-restrictions")) {
             getServer().getPluginManager().registerEvents(new RestrictionEvents(this), this);
@@ -206,10 +210,6 @@ public class BattleKits extends JavaPlugin {
             getLogger().info("Not enabling restrictions due to config setting");
         }
 
-        //getCommand("toolkit").setExecutor(new CommandKitCreation(this)); Don't register commands we don't use
-        getCommand("fillall").setExecutor(new CommandRefillAll(this));
-        getCommand("soup").setExecutor(new CommandSoup(this));
-        getCommand("battlekits").setExecutor(cbk);
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
             this.getLogger().info("Vault found.");
             setupEconomy();

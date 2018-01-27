@@ -22,7 +22,7 @@ public class RespawnKit implements Listener {
         if (p.hasPermission("battlekits.auto.disable")) { // This should disable auto kits for OPs or '*'
             return;
         }
-        if (kit != null && p.hasPermission("Battlekits.auto." + kit) && !(boolean) plugin.checkSetting("settings.override-disable-respawn-kits", p, false)) {
+        if (kit != null && p.hasPermission("battlekits.auto." + kit) && !(boolean) plugin.checkSetting("settings.override-disable-respawn-kits", p, false)) {
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.cbk.supplyKit(p, kit, false, false, false, false), 20L);
         }
     }

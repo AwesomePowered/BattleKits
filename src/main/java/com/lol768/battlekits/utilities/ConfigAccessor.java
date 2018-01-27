@@ -74,15 +74,15 @@ public class ConfigAccessor {
             defConfig = YamlConfiguration.loadConfiguration(new BufferedReader(new InputStreamReader(defConfigStream)));
             fileConfiguration.setDefaults(defConfig);
             fileConfiguration = defConfig;
-            if (fileName == "kitHistory.yml") {
+            if (fileName.equalsIgnoreCase("kitHistory.yml")) {
             	fileConfiguration.options().header("This file contains the kit history, i.e. the last kit the user requested for respawning kits on death\nAlso contains info on whether the player has used their kit in their life\nThere is no reason to ever modify this file.");
             }
 
-            if (fileName == "global.yml") {
+            if (fileName.equalsIgnoreCase("global.yml")) {
             	fileConfiguration.options().header("Global BattleKits settings\nAdd world-specific blocks by warapping everything in the name of the world.\nRestrictions are handled by permissions now.");
             }
 
-            if (fileName == "kits.yml") {
+            if (fileName.equalsIgnoreCase("kits.yml")) {
             	fileConfiguration.options().header("Kit definitions\nThis is where you can add your own kits and customise various details");
             }
             plugin.getLogger().info("Saving " + fileName + "...");
@@ -100,7 +100,6 @@ public class ConfigAccessor {
 
     public void saveConfig() {
         if (fileConfiguration == null || configFile == null) {
-            return;
         } else {
             try {
                 getConfig().save(configFile);

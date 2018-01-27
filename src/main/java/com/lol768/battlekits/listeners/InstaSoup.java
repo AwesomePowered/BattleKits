@@ -38,13 +38,13 @@ public class InstaSoup implements Listener {
 
                         if (p.getFoodLevel() + 6 <= 20) { //Only add some hunger back on
                             event.setCancelled(true);
-                            p.getInventory().setItemInMainHand(bowl);
+                            clearHand(p);
                             p.setFoodLevel(p.getFoodLevel() + 6);
                         }
 
                         if (p.getFoodLevel() + 6 > 20) { //Hunger close to max, so refill it
                             event.setCancelled(true);
-                            p.getInventory().setItemInMainHand(bowl);
+                            clearHand(p);
                             p.setFoodLevel(20);
                         }
                     }
@@ -60,18 +60,26 @@ public class InstaSoup implements Listener {
 
                         if (p.getHealth() + 6 <= 20) { //Only add some health back on
                             event.setCancelled(true);
-                            p.getInventory().setItemInMainHand(bowl);
+                            clearHand(p);
                             p.setHealth(p.getHealth() + 6);
                         }
 
                         if (p.getHealth() + 6 > 20) { //Health close to max, so refill it
                             event.setCancelled(true);
-                            p.getInventory().setItemInMainHand(bowl);
+                            clearHand(p);
                             p.setHealth(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
                         }
                     }
                 }
             }
         }
+    }
+
+    public void clearHand(Player p) {
+        if ((boolean) plugin.checkSetting("settings.instant-soup-drink.remove-bowl", p, false)) {
+            p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+            return;
+        }
+        p.getInventory().setItemInMainHand(new ItemStack(Material.BOWL));
     }
 }

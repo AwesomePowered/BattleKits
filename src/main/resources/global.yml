@@ -13,6 +13,7 @@ settings:
 instant-soup-drink:
   type: 'MUSHROOM_SOUP' #MUSHROOM_STEW 1.13+
   replenish-type: hunger #Could be hunger/health
+  remove-bowl: true #Should we remove the bowl after the soup is consumed
 signs:
   enabled: true
   ignore-permissions: false
