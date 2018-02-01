@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import static com.lol768.battlekits.utilities.Localisation.m;
 
 public class CommandBattleKits implements CommandExecutor {
 
@@ -40,7 +41,7 @@ public class CommandBattleKits implements CommandExecutor {
 
             if (args.length == 0) {
                 if (!sender.hasPermission("battlekits.listkits")) {
-                    plugin.PM.warn(sender, "You do not have permission to use this command.");
+                    plugin.PM.warn(sender, m("kitPermMSG"));
                     return true;
                 }
                 String kit_ref = "";
@@ -58,13 +59,12 @@ public class CommandBattleKits implements CommandExecutor {
                     kit_ref += s + ", "; //Add new kit info to String
                 }
                 kit_ref = kit_ref.substring(0, kit_ref.length() - 2); //remove last comma and space
-                plugin.PM.notify(sender, "Available kits (cost): "); //Header for info
-                plugin.PM.notify(sender, "Accessible kits are marked green.");
+                plugin.PM.notify(sender, m("kitHeader")); //Header for info
                 sender.sendMessage(kit_ref); //Send the kit list
                 return true;
             }
             if (args.length != 1 && args.length != 2) {
-                plugin.PM.warn(sender, "Need at least one argument");
+                plugin.PM.warn(sender, m("oneArgNeeded"));
                 return true;
             }
 
@@ -73,12 +73,13 @@ public class CommandBattleKits implements CommandExecutor {
              */
             if (args[0].equals("reload")) {
                 if (!sender.hasPermission("battlekits.config.reload")) {
-                    plugin.PM.warn(sender, "You don't have permission to use this command.");
+                    plugin.PM.warn(sender, m("cmdPermMSG"));
                     return true;
                 }
                 plugin.kits.reloadConfig();
                 plugin.global.reloadConfig();
-                plugin.PM.notify(sender, "Kit and global configs reloaded!");
+                plugin.PM.notify(sender, m("reloadedKits"));
+                plugin.PM.notify(sender, m("reloadedGlobal"));
 
                 return true;
             }
@@ -90,13 +91,13 @@ public class CommandBattleKits implements CommandExecutor {
              */
             if (!(sender instanceof Player)) {
                 if (args.length != 2) {
-                    plugin.PM.warn(sender, "Usage for console: /<command> <kit> <player>");
+                    plugin.PM.warn(sender, m("consoleCmdUsage"));
                     return true;
                 }
                 Player p = Bukkit.getPlayer(args[1]);
 
                 if (p == null) {
-                    plugin.PM.warn(sender, "Couldn't locate specified player.");
+                    plugin.PM.warn(sender, m("playerNotFound"));
                     return true;
                 }
 
@@ -112,12 +113,12 @@ public class CommandBattleKits implements CommandExecutor {
                     Player p = Bukkit.getPlayer(args[1]);
 
                     if (p == null) {
-                        plugin.PM.warn(sender, "Couldn't locate specified player.");
+                        plugin.PM.warn(sender, m("playerNotFound"));
                         return true;
                     }
 
                     if (!sender.hasPermission("battlekits.kit.other")) {
-                        plugin.PM.warn(sender, "You don't have permission for indirect kit distribution.");
+                        plugin.PM.warn(sender, m("indirectPermMSG"));
                         return true;
 
                     }
@@ -190,7 +191,7 @@ public class CommandBattleKits implements CommandExecutor {
     public Boolean supplyKit(final Player p, String className, boolean ignorePerms, boolean ignoreCost, boolean ignoreLives, boolean ignoreWorldRestriction) {
         if (p.hasPermission("battlekits.use." + className) || ignorePerms) { //Ensure they have permission to use the kit
         } else {
-            plugin.PM.warn(p, "You do not have permission to use this kit!");
+            plugin.PM.warn(p, m("kitPermMSG"));
             return true;
         }
 
@@ -210,16 +211,16 @@ public class CommandBattleKits implements CommandExecutor {
                     if (plugin.kits.getConfig().contains("kits." + className + ".active-in")) {
                         if (!(plugin.kits.getConfig().getString("kits." + className + ".active-in").contains("'" + p.getWorld().getName() + "'") || plugin.kits.getConfig().getString("kits." + className + ".active-in").equals("all"))) {
                             if (!ignoreWorldRestriction) {
-                                plugin.PM.warn(p, "This kit is disabled in your current world (" + p.getWorld().getName() + ")");
+                                plugin.PM.warn(p, m("kitDisabled", p.getWorld().getName()));
                                 return true;
                             }
                         }
                     }
                 } else {
-                    plugin.PM.warn(p, "Please choose a valid kit!");
+                    plugin.PM.warn(p, m("kitNotFound"));
                 }
             } else {
-                plugin.PM.warn(p, "You may only use one kit per life!");
+                plugin.PM.warn(p, m("oneKitPerLife"));
 
                 return true;
             }
@@ -236,7 +237,7 @@ public class CommandBattleKits implements CommandExecutor {
                     return true;
                 } else {
                     plugin.kitHistory.getConfig().set(p.getName() + ".unlocked." + className, true);
-                    p.sendMessage(ChatColor.GREEN + "You have now permanently unlocked this kit!");
+                    plugin.PM.notify(p, m("kitUnlocked", className));
 
                 }
 
@@ -263,15 +264,7 @@ public class CommandBattleKits implements CommandExecutor {
          * Handles kit give message
          */
         if (plugin.kits.getConfig().contains("kits." + className + ".on-give-message")) {
-
-            if (!plugin.kits.getConfig().getString("kits." + className + ".on-give-message").contains("&h")) { //User may wish to hide BattleKits prefix
-                plugin.PM.notify(p, ChatColor.translateAlternateColorCodes('&', plugin.kits.getConfig().getString("kits." + className + ".on-give-message")));
-
-            } else {
-                p.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.kits.getConfig().getString("kits." + className + ".on-give-message").replace("&h", "")));
-
-            }
-
+            plugin.PM.notify(p, plugin.kits.getConfig().getString("kits." + className + ".on-give-message"));
         }
 
         /**
@@ -280,7 +273,6 @@ public class CommandBattleKits implements CommandExecutor {
         if (plugin.kits.getConfig().contains("kits." + className + ".xpLevels")) {
             int amount = plugin.kits.getConfig().getInt("kits." + className + ".xpLevels");
             int required = getExpTolevel(amount);
-            plugin.getLogger().info(Integer.toString(required));
             required = required - (int) p.getExp();
             int divisor = 5;
             int quotient = required / divisor;
@@ -482,7 +474,6 @@ public class CommandBattleKits implements CommandExecutor {
         if (finalHelmet != null && s1 != -2 && s1 != -3) {
             finalHelmet.setDurability(s1);
         }
-        plugin.getLogger().info("Setting durability to " + s1);
         if (finalChestplate != null && s2 != -2 && s1 != -3) {
             finalChestplate.setDurability(s2);
         }
@@ -492,9 +483,6 @@ public class CommandBattleKits implements CommandExecutor {
         if (finalBoots != null && s4 != -2 && s1 != -3) {
             finalBoots.setDurability(s4);
         }
-
-
-
 
         if (plugin.kits.getConfig().contains("kits." + className + ".items.helmetEnchant") && finalHelmet != null) {
             for (String a : plugin.kits.getConfig().getString("kits." + className + ".items.helmetEnchant").split(" ")) {

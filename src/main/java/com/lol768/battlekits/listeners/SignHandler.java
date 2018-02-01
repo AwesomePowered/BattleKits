@@ -12,6 +12,8 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import static com.lol768.battlekits.utilities.Localisation.m;
+
 import java.util.logging.Level;
 
 public class SignHandler implements Listener {
@@ -29,21 +31,19 @@ public class SignHandler implements Listener {
 
             Sign s = (Sign) e.getClickedBlock().getState();
             String[] lines = s.getLines();
-            if (lines.length > 1 && lines[0].equals(ChatColor.DARK_RED + "[" + ChatColor.stripColor(plugin.global.getConfig().getString("brand")) + "]")) {
+            if (lines.length > 1 && isSign(lines[0])) {
                 e.setCancelled(true);
                 if (p.hasPermission("battlekits.sign.use")) {
 
                     if (!plugin.kits.getConfig().contains("kits." + lines[1])) {
                         if (lines[1].equals("soupFill")) {
                             if (!p.hasPermission("battlekits.soupfill")) {
-                                plugin.PM.warn(p, "You don't have permission for this!");
+                                plugin.PM.warn(p, m("genericNoPerm"));
                                 return;
                             }
                             boolean rez = true;
                             if ((Double) plugin.checkSetting("signs.soupFillCost", p, null) != null && BattleKits.economy != null) {
                                 rez = plugin.buyNeutral((Double) plugin.checkSetting("signs.soupFillCost", p, null), p.getName());
-                            } else {
-                                plugin.getLogger().log(Level.INFO, "{0} {1}", new Object[]{BattleKits.economy, plugin.checkSetting("signs.soupFillCost", p, null)});
                             }
                             if (rez) {
                                 for (ItemStack i : p.getInventory().getContents()) {
@@ -53,14 +53,14 @@ public class SignHandler implements Listener {
                                 }
                             }
                         } else {
-                            plugin.PM.warn(p, "That kit does not exist!");
+                            plugin.PM.warn(p, m("kitNotFound"));
                         }
                     } else {
                         plugin.getLogger().log(Level.INFO, "Supplying kit - {0}", lines[1]);
                         plugin.cbk.supplyKit(p, lines[1], (boolean) plugin.checkSetting("signs.ignore-permissions", p, false), (boolean) plugin.checkSetting("signs.ignore-costs", p, false), (boolean) plugin.checkSetting("signs.ignore-lives-restriction", p, false), (boolean) plugin.checkSetting("signs.ignore-world-restriction", p, false));
                     }
                 } else {
-                    plugin.PM.warn(p, "You don't have permission to use kit signs");
+                    plugin.PM.warn(p, m("KitSignUsePermMSG"));
                 }
             }
         }
@@ -71,23 +71,28 @@ public class SignHandler implements Listener {
         String[] lines = e.getLines();
         Player p = e.getPlayer();
 
-        if (lines.length > 1 && lines[0].equalsIgnoreCase("[" + ChatColor.stripColor(plugin.global.getConfig().getString("brand")) + "]")) {
+        if (lines.length > 1 && isSign(lines[0])) {
 
             if (p.hasPermission("battlekits.sign.create")) {
 
                 if (plugin.kits.getConfig().contains("kits." + lines[1]) || lines[1].equals("soupFill")) {
-                    e.setLine(0, ChatColor.DARK_RED + "[" + ChatColor.stripColor(plugin.global.getConfig().getString("brand")) + "]");
-                    plugin.PM.notify(p, "Kit sign created successfully!");
+                    e.setLine(0, ChatColor.translateAlternateColorCodes('&',"&4[&6"+plugin.global.getConfig().getString("brand")+"&4]"));
+                    plugin.PM.notify(p, m("kitSignMade"));
 
                 } else {
                     e.getBlock().breakNaturally();
-                    plugin.PM.warn(p, "That kit does not exist!");
+                    plugin.PM.warn(p, m("kitNotFound"));
                 }
             } else {
-                plugin.PM.warn(p, "You don't have permission to create kit signs");
+                plugin.PM.warn(p, m("KitSignCreatePermMSG"));
                 e.getBlock().breakNaturally();
 
             }
         }
+    }
+
+    public boolean isSign(String s) {
+        s = ChatColor.stripColor(s);
+        return s.equalsIgnoreCase("["+ChatColor.stripColor(plugin.global.getConfig().getString("brand"))+"]");
     }
 }

@@ -11,6 +11,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import static com.lol768.battlekits.utilities.Localisation.m;
+
 public class DeathEvent implements Listener {
 
     private BattleKits plugin;
@@ -61,7 +63,7 @@ public class DeathEvent implements Listener {
                 }
 
                 if ((boolean) plugin.checkSetting("settings.show-kit-info-on-respawn", p, false)) {
-                    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.PM.notify(p, "You may now use a kit"), 60L);
+                    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.PM.notify(p, m("kitAvailable")), 60L);
 
                 }
 

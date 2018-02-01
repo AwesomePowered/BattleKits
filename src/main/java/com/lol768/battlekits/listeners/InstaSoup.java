@@ -11,6 +11,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import static com.lol768.battlekits.utilities.Localisation.m;
+
 public class InstaSoup implements Listener {
 
     public BattleKits plugin;
@@ -32,7 +34,7 @@ public class InstaSoup implements Listener {
 
                         if (p.getFoodLevel() == 20) {//If food is full, stop the code.
                             event.setCancelled(true);
-                            p.sendMessage(ChatColor.RED + "Your food is already full!");
+                            plugin.PM.notify(p, m("fullHunger"));
                             return;
                         }
 
@@ -54,7 +56,7 @@ public class InstaSoup implements Listener {
 
                         if (p.getHealth() == p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) {//If health is full, stop the code.
                             event.setCancelled(true);
-                            p.sendMessage(ChatColor.RED + "You are already full health!");
+                            plugin.PM.notify(p, m("fullHealth"));
                             return;
                         }
 

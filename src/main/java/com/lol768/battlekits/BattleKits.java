@@ -4,6 +4,7 @@ import com.lol768.battlekits.listeners.RespawnKit;
 import com.lol768.battlekits.listeners.SignHandler;
 import com.lol768.battlekits.utilities.ConfigAccessor;
 import com.lol768.battlekits.utilities.Converter;
+import com.lol768.battlekits.utilities.Localisation;
 import com.lol768.battlekits.utilities.PM;
 import com.lol768.battlekits.listeners.RestrictionEvents;
 import com.lol768.battlekits.listeners.PlayerReward;
@@ -12,7 +13,12 @@ import com.lol768.battlekits.listeners.DeathEvent;
 import com.lol768.battlekits.commands.CommandRefillAll;
 import com.lol768.battlekits.commands.CommandBattleKits;
 import com.lol768.battlekits.commands.CommandSoup;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -20,11 +26,16 @@ import java.util.logging.Level;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import static com.lol768.battlekits.utilities.Localisation.m;
 
 public class BattleKits extends JavaPlugin {
 
@@ -40,7 +51,7 @@ public class BattleKits extends JavaPlugin {
     public void onEnable() {
         legacyType = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].split("R")[0];
         if (!createDataDirectory()) {
-            this.getLogger().severe("Couldn't create BattleKits data folder. Shutting down...");
+            getLogger().severe("Couldn't create BattleKits data folder. Shutting down...");
             this.setEnabled(false);
         }
         makeConfigs();
@@ -134,20 +145,15 @@ public class BattleKits extends JavaPlugin {
 
     }
 
-    public static String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
-
     public boolean buy(double amount, String name) {
         Player p = Bukkit.getPlayer(name);
         net.milkbowl.vault.economy.EconomyResponse r = economy.withdrawPlayer(name, amount);
 
         if (r.transactionSuccess()) {
-            this.PM.notify(p, "Purchase successful! You spent " + amount + " and now have " + r.balance);
+            PM.notify(p, m("economyOk", amount, r.balance));
             return true;
         } else {
-            this.PM.warn(p, "You don't have enough money! The kit costs " + amount + " and you have " + r.balance);
+            PM.warn(p, m("economyFail", amount, r.balance));
         }
         return false;
     }
@@ -157,11 +163,11 @@ public class BattleKits extends JavaPlugin {
         net.milkbowl.vault.economy.EconomyResponse r = economy.withdrawPlayer(name, amount);
 
         if (r.transactionSuccess()) {
-            this.PM.notify(p, "Purchase successful! You spent " + amount + " and now have " + r.balance);
+            PM.notify(p, m("economyOk", amount, r.balance));
             return true;
 
         } else {
-            this.PM.warn(p, "You don't have enough money! This costs " + amount + " and you have " + r.balance);
+            PM.notify(p, m("economyFail", amount, r.balance));
         }
         return false;
     }
@@ -185,6 +191,33 @@ public class BattleKits extends JavaPlugin {
         global.reloadConfig();
         kitHistory.reloadConfig();
         postStartup();
+        loadMessagesCache();
+    }
+
+    public void loadMessagesCache() {
+        String locale = global.getConfig().getString("settings.locale", "en");
+        File messagesFile = new File(getDataFolder(), "messages.yml");
+        FileConfiguration c = new YamlConfiguration();
+        if (messagesFile.exists()) {
+            try {
+                debug("Messages.yml found, loading...");
+                c.load(messagesFile);
+            } catch (IOException | InvalidConfigurationException e) {
+                e.printStackTrace();
+            }
+        } else {
+            InputStream localeStream = this.getResource("messages_LOCALE.yml".replace("LOCALE", locale));
+            try {
+                debug("Loading locale file.", locale);
+                c.load(new BufferedReader(new InputStreamReader(localeStream)));
+            } catch (IOException | InvalidConfigurationException e) {
+                e.printStackTrace();
+            }
+        }
+        for (String key : c.getKeys(false)) {
+            Localisation.messagesCache.put(key, c.getString(key));
+        }
+        PM.prefix = "&7[&6"+global.getConfig().getString("brand")+"&7] ";
     }
 
     public void postStartup() {
@@ -202,20 +235,19 @@ public class BattleKits extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new SignHandler(this), this);
         }
 
-
         if (global.getConfig().getBoolean("settings.enable-restrictions")) {
             getServer().getPluginManager().registerEvents(new RestrictionEvents(this), this);
-            getLogger().info("Restrictions enabled. Use permissions to setup");
+            debug("Restrictions enabled. Use permissions to setup");
         } else {
-            getLogger().info("Not enabling restrictions due to config setting");
+            debug("Not enabling restrictions due to config setting");
         }
 
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
-            this.getLogger().info("Vault found.");
+            debug("Vault found.");
             setupEconomy();
 
         } else {
-            this.getLogger().info("Couldn't find Vault. Economy disabled for now.");
+            debug("Couldn't find Vault. Economy disabled for now.");
         }
     }
 

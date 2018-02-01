@@ -9,53 +9,28 @@ import org.bukkit.entity.Player;
 public class PM {
 
     public BattleKits plugin;
+    public String prefix;
 
     public PM(BattleKits instance) {
         plugin = instance;
     }
 
-    /**
-     * Logger method which supports localisation
-     *
-     * @param message
-     */
-    public void trLogger(String message, String type) {
-        String ld = plugin.global.getConfig().getString("language"); //User's selected language
-
-        if (plugin.global.getConfig().contains("messages." + ld + "." + message)) {
-            message = plugin.global.getConfig().getString("messages." + ld + "." + message);
+    public void message(Player player, String message) {
+        if (message.startsWith("&h")) {
+            message = message.substring(2);
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         } else {
-            try {
-                throw new Exception("Gimme class name");
-            } catch (Exception e) {
-                plugin.getLogger().severe("Not given a valid language in config at " + e.getStackTrace()[1].getClassName() + "." + e.getStackTrace()[1].getMethodName() + "!");
-            }
-            return;
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix+message));
         }
-        if (type.equals("info")) {
-            plugin.getLogger().info(message);
-            return;
+    }
 
+    public void message(CommandSender player, String message) {
+        if (message.startsWith("&h")) {
+            message = message.substring(2);
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+        } else {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix+message));
         }
-
-        if (type.equals("warn") || type.equals("warning")) {
-            plugin.getLogger().warning(message);
-            return;
-        }
-
-        if (type.equals("error") || type.equals("severe")) {
-            plugin.getLogger().severe(message);
-
-            return;
-
-        }
-        try {
-            throw new Exception("Gimme class name");
-        } catch (Exception e) {
-            plugin.getLogger().log(Level.SEVERE, "Not given a valid type in {0}.{1}!", new Object[]{e.getStackTrace()[1].getClassName(), e.getStackTrace()[1].getMethodName()});
-        }
-
-
     }
 
     /**
@@ -66,7 +41,7 @@ public class PM {
      * @param message - The message to send them
      */
     public void warn(Player player, String message) {
-        player.sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + ChatColor.translateAlternateColorCodes('&', plugin.global.getConfig().getString("brand")) + ChatColor.GRAY + "]" + ChatColor.RED + " " + message);
+        message(player, message);
     }
 
     /**
@@ -77,7 +52,7 @@ public class PM {
      * @param message - The message to send them
      */
     public void warn(CommandSender sender, String message) {
-        sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + ChatColor.translateAlternateColorCodes('&', plugin.global.getConfig().getString("brand")) + ChatColor.GRAY + "]" + ChatColor.RED + " " + message);
+        message(sender, message);
     }
 
     /**
@@ -88,7 +63,7 @@ public class PM {
      * @param message - The message to send them
      */
     public void notify(CommandSender player, String message) {
-        player.sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + ChatColor.translateAlternateColorCodes('&', plugin.global.getConfig().getString("brand")) + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + message);
+        message(player, message);
     }
 
     /**
@@ -99,6 +74,6 @@ public class PM {
      * @param message - The message to send them
      */
     public void notify(Player player, String message) {
-        player.sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + ChatColor.translateAlternateColorCodes('&', plugin.global.getConfig().getString("brand")) + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + message);
+        message(player, message);
     }
 }

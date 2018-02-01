@@ -32,6 +32,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import static com.lol768.battlekits.utilities.Localisation.m;
+
 /**
  * Class that sorts out the configs
  * @author SagaciousZed & lol768
@@ -47,9 +49,9 @@ public class ConfigAccessor {
 
     public ConfigAccessor(JavaPlugin plugin, String fileName) {
         if (plugin == null)
-            throw new IllegalArgumentException("plugin cannot be null");
+            throw new IllegalArgumentException("Plugin cannot be null");
         if (!plugin.isEnabled())
-            throw new IllegalArgumentException("plugin must be initiaized");
+            throw new IllegalArgumentException("Plugin must be initiaized");
         this.plugin = plugin;
         this.fileName = fileName;
     }
@@ -67,10 +69,9 @@ public class ConfigAccessor {
 
         // Look for defaults in the jar
         InputStream defConfigStream = plugin.getResource(fileName);
-    	plugin.getLogger().info("length is " + configFile.length());
 
         if (defConfigStream != null && configFile.length() < 1) {
-        	plugin.getLogger().info("Generating config for " + fileName);
+        	plugin.getLogger().info(m("confGen", fileName));
             defConfig = YamlConfiguration.loadConfiguration(new BufferedReader(new InputStreamReader(defConfigStream)));
             fileConfiguration.setDefaults(defConfig);
             fileConfiguration = defConfig;
@@ -85,7 +86,7 @@ public class ConfigAccessor {
             if (fileName.equalsIgnoreCase("kits.yml")) {
             	fileConfiguration.options().header("Kit definitions\nThis is where you can add your own kits and customise various details");
             }
-            plugin.getLogger().info("Saving " + fileName + "...");
+            plugin.getLogger().info(m("confSaving", fileName));
             this.saveConfig();
         }
 
@@ -104,7 +105,7 @@ public class ConfigAccessor {
             try {
                 getConfig().save(configFile);
             } catch (IOException ex) {
-                plugin.getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
+                plugin.getLogger().log(Level.SEVERE, m("confSaveError", fileName, ex));
             }
         }
     }

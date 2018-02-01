@@ -7,6 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import static com.lol768.battlekits.utilities.Localisation.m;
 
 public class CommandRefillAll implements CommandExecutor {
 
@@ -20,7 +21,7 @@ public class CommandRefillAll implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("fillall")) {
             if(!(sender instanceof Player)) {
-                plugin.PM.warn(sender, "This is a player only command.");
+                plugin.PM.warn(sender, m("cmdPlayerOnly"));
                 return true;
             }
             Player p = (Player) sender;
@@ -36,13 +37,13 @@ public class CommandRefillAll implements CommandExecutor {
                 }
 
                 if (!gotBowl) {
-                    plugin.PM.warn(p, "You have no empty bowls!");
+                    plugin.PM.warn(p, m("noBowls"));
                     return true;
                 }
                 return true;
 
             } else {
-                plugin.PM.warn(p, "You don't have permission for this command.");
+                plugin.PM.warn(p, m("cmdPermMSG"));
                 return true;
             }
         }
