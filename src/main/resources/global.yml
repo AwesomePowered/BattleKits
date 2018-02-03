@@ -10,7 +10,7 @@ settings:
   instant-soup-drink: false
   clear-default: false
   converted: false #Is the kits.yml converted to Material enum
-  locale: 'en'
+  locale: 'en' #Currently supports de. en. es. fr. it.
 instant-soup-drink:
   type: 'MUSHROOM_SOUP' #MUSHROOM_STEW 1.13+
   replenish-type: hunger #Could be hunger/health

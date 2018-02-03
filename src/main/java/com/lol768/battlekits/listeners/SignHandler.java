@@ -27,7 +27,7 @@ public class SignHandler implements Listener {
     @EventHandler
     public void signClick(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock() != null && (e.getClickedBlock().getType() == Material.WALL_SIGN || e.getClickedBlock().getType() == Material.SIGN)) {
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock() != null && (e.getClickedBlock().getType() == Material.WALL_SIGN || e.getClickedBlock().getType() == Material.SIGN_POST)) {
 
             Sign s = (Sign) e.getClickedBlock().getState();
             String[] lines = s.getLines();
@@ -48,7 +48,7 @@ public class SignHandler implements Listener {
                             if (rez) {
                                 for (ItemStack i : p.getInventory().getContents()) {
                                     if (i == null) {
-                                        p.getInventory().addItem(new ItemStack(Material.valueOf(plugin.global.getConfig().getString("instant-soup-drink.type")), 1));
+                                        p.getInventory().addItem(new ItemStack(Material.valueOf(plugin.global.getConfig().getString("instant-soup-drink.type", "MUSHROOM_SOUP")), 1));
                                     }
                                 }
                             }
@@ -56,7 +56,6 @@ public class SignHandler implements Listener {
                             plugin.PM.warn(p, m("kitNotFound"));
                         }
                     } else {
-                        plugin.getLogger().log(Level.INFO, "Supplying kit - {0}", lines[1]);
                         plugin.cbk.supplyKit(p, lines[1], (boolean) plugin.checkSetting("signs.ignore-permissions", p, false), (boolean) plugin.checkSetting("signs.ignore-costs", p, false), (boolean) plugin.checkSetting("signs.ignore-lives-restriction", p, false), (boolean) plugin.checkSetting("signs.ignore-world-restriction", p, false));
                     }
                 } else {
