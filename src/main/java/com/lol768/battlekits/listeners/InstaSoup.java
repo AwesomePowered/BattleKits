@@ -1,7 +1,6 @@
 package com.lol768.battlekits.listeners;
 
 import com.lol768.battlekits.BattleKits;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -30,8 +29,6 @@ public class InstaSoup implements Listener {
             if (mat != null && mat == Material.valueOf(plugin.global.getConfig().getString("instant-soup-drink.type", "MUSHROOM_SOUP"))) {
                 if ((boolean) plugin.checkSetting("settings.instant-soup-drink", p, false)) {
                     if (plugin.checkSetting("instant-soup-drink.replenish-type", p, "hunger").equals("hunger")) {
-                        ItemStack bowl = new ItemStack(Material.BOWL, 1);
-
                         if (p.getFoodLevel() == 20) {//If food is full, stop the code.
                             event.setCancelled(true);
                             plugin.PM.notify(p, m("fullHunger"));
@@ -52,8 +49,6 @@ public class InstaSoup implements Listener {
                     }
 
                     if (plugin.checkSetting("instant-soup-drink.replenish-type", p, "hunger").equals("health")) {
-                        ItemStack bowl = new ItemStack(Material.BOWL, 1);
-
                         if (p.getHealth() == p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) {//If health is full, stop the code.
                             event.setCancelled(true);
                             plugin.PM.notify(p, m("fullHealth"));
@@ -78,7 +73,7 @@ public class InstaSoup implements Listener {
     }
 
     public void clearHand(Player p) {
-        if ((boolean) plugin.checkSetting("settings.instant-soup-drink.remove-bowl", p, false)) {
+        if ((boolean) plugin.checkSetting("instant-soup-drink.remove-bowl", p, true)) {
             p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
             return;
         }

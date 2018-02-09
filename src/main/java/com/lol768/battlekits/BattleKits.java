@@ -1,5 +1,6 @@
 package com.lol768.battlekits;
 
+import com.lol768.battlekits.commands.CommandKitCreation;
 import com.lol768.battlekits.listeners.RespawnKit;
 import com.lol768.battlekits.listeners.SignHandler;
 import com.lol768.battlekits.utilities.ConfigAccessor;
@@ -226,7 +227,7 @@ public class BattleKits extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerReward(this), this);
         getServer().getPluginManager().registerEvents(new InstaSoup(this), this);
 
-        //getCommand("toolkit").setExecutor(new CommandKitCreation(this)); Don't register commands we don't use
+        getCommand("toolkit").setExecutor(new CommandKitCreation(this));
         getCommand("fillall").setExecutor(new CommandRefillAll(this));
         getCommand("soup").setExecutor(new CommandSoup(this));
         getCommand("battlekits").setExecutor(cbk);

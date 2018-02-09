@@ -101,6 +101,7 @@ public class ConfigAccessor {
 
     public void saveConfig() {
         if (fileConfiguration == null || configFile == null) {
+
         } else {
             try {
                 getConfig().save(configFile);
@@ -110,10 +111,5 @@ public class ConfigAccessor {
         }
     }
 
-    public void saveDefaultConfig() {
-        if (!configFile.exists()) {
-            this.plugin.saveResource(fileName, false);
-        }
-    }
 
 }

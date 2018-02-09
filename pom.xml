@@ -78,10 +78,6 @@
             <id>bstats-repo</id>
             <url>http://repo.bstats.org/content/repositories/releases/</url>
         </repository>
-        <repository>
-            <id>mvdw</id>
-            <url>http://repo.mvdw-software.be/content/groups/public/</url>
-        </repository>
     </repositories>
     <dependencies>
         <dependency>

@@ -1,7 +1,6 @@
 package com.lol768.battlekits.utilities;
 
 import com.lol768.battlekits.BattleKits;
-import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

@@ -12,8 +12,12 @@ commands:
   soup:
     usage: /<command>
     description: Refills soup bowl in your hand
-    aliases: [refill,stew]
+    aliases: [refill,stew,soup]
   fillall:
     usage: /<command>
     description: Refills all soup in inventory
     aliases: [fullsoup]
+  toolkit:
+    usage: /<command> [name]
+    description: Allows creation of kits with what is in the inventory.
+    aliases: [tk]

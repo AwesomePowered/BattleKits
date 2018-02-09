@@ -42,7 +42,7 @@ public class SignHandler implements Listener {
                                 return;
                             }
                             boolean rez = true;
-                            if ((Double) plugin.checkSetting("signs.soupFillCost", p, null) != null && BattleKits.economy != null) {
+                            if (plugin.checkSetting("signs.soupFillCost", p, null) != null && BattleKits.economy != null) {
                                 rez = plugin.buyNeutral((Double) plugin.checkSetting("signs.soupFillCost", p, null), p.getName());
                             }
                             if (rez) {
